@@ -1,5 +1,6 @@
 import Principal "mo:base/Principal";
 import HashMap "mo:base/HashMap";
+import Debug "mo:base/Debug";
 
 actor Token{
     var owner: Principal = Principal.fromText("njr2m-r6kza-aetly-julyl-zggjb-fhcrc-6md6f-pndei-3hu5f-pxvce-sqe");
@@ -17,5 +18,37 @@ actor Token{
         };
 
         return balance;
-    }
+    };
+
+    public query func getSymbol() : async Text {
+        return symbol;
+    };
+
+    public shared(msg) func payOut() : async Text {
+
+        if(balances.get(msg.caller) == null) {
+            balances.put(msg.caller, 10000);
+            Debug.print(debug_show(msg.caller));
+            return "Success";
+        } else {
+            return "Free BTokens already claimed";
+        }
+    };
+
+    public shared(msg) func transfer(to: Principal, amount: Nat): async Text{
+        let fromBalance = await balanceOf(msg.caller);
+
+        if(fromBalance > amount) {
+            let newFromBalance: Nat = fromBalance - amount;
+            balances.put(msg.caller, newFromBalance);
+            
+            let toBalance = await balanceOf(to);
+            let newToBalance = toBalance + amount;
+            balances.put(to, newToBalance);
+
+            return "Success";
+        } else {
+            return "Insufficient funds";
+        }
+    };
 }
