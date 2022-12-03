@@ -27,9 +27,7 @@ actor Token{
     public shared(msg) func payOut() : async Text {
 
         if(balances.get(msg.caller) == null) {
-            balances.put(msg.caller, 10000);
-            Debug.print(debug_show(msg.caller));
-            return "Success";
+            return await transfer(msg.caller, 10000);
         } else {
             return "Free BTokens already claimed";
         }
